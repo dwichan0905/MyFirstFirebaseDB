@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             R.id.showdata -> {
-                /* no-op */
+                startActivity(Intent(this, ListDataActivity::class.java))
             }
         }
     }
