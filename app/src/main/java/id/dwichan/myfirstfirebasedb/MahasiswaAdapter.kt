@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.item_mahasiswa.view.*
 
 
@@ -48,7 +51,19 @@ class MahasiswaAdapter: RecyclerView.Adapter<MahasiswaAdapter.MahasiswaViewHolde
                                 context.startActivity(intent)
                             }
                             1 -> {
-                                /* no-op */
+                                val userId = FirebaseAuth.getInstance().uid!!
+                                val reference = FirebaseDatabase.getInstance().reference
+                                reference.child("Admin")
+                                    .child(userId)
+                                    .child("Mahasiswa")
+                                    .child(mahasiswa.key!!)
+                                    .removeValue()
+                                    .addOnSuccessListener {
+                                        Toast.makeText(context, "Berhasil menghapus data ${mahasiswa.nama}!!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "Gagal hapus data!\nAlasan: ${it.message!!}", Toast.LENGTH_SHORT).show()
+                                    }
                             }
                         }
                     }
