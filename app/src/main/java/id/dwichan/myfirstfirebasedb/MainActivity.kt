@@ -7,6 +7,8 @@ import android.view.View
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -92,7 +94,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
             }
             R.id.save -> {
-                /* no-op */
+                val userId = auth.currentUser?.uid // <-- mengambil User ID pengguna
+
+                // ambil instance Firebase Realtime DB
+                val database = FirebaseDatabase.getInstance()
+                val reference = database.reference
+
+                val mNim = nim.text.toString()
+                val mNama = nama.text.toString()
+                val mJurusan = jurusan.text.toString()
+
+                if (mNim.isEmpty() || mNama.isEmpty() || mJurusan.isEmpty()) {
+                    Toast.makeText(this, "Data tidak boleh ada yg kosong!", Toast.LENGTH_SHORT).show()
+                } else {
+                    val mahasiswa = Mahasiswa()
+                    mahasiswa.nim = mNim
+                    mahasiswa.nama = mNama
+                    mahasiswa.jurusan = mJurusan
+                    // simpan data ke database!
+                    reference.child("Admin")
+                        .child(userId!!)
+                        .child("Mahasiswa")
+                        .push()
+                        .setValue(mahasiswa)
+                        .addOnSuccessListener {
+                            nim.setText("")
+                            nama.setText("")
+                            jurusan.setText("")
+
+                            Toast.makeText(this, "Berhasil input data!", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Gagal input data!\nAlasan: ${it.message!!}", Toast.LENGTH_SHORT).show()
+                        }
+                }
             }
             R.id.showdata -> {
                 /* no-op */
